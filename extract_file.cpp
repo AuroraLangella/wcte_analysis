@@ -41,7 +41,7 @@ int main(){
             WCTERawData p;
             BinaryStream input;
 
-            // Apri un singolo file 
+            // Apri un singolo file di 20 s
             input.Bopen(filePath, READ, UNCOMPRESSED);
 
             input >> p;
@@ -49,10 +49,10 @@ int main(){
             //Leggi tutto il file
             //p.Print()
 
-            // Leggi un singolo time slice 
+            // Leggi un singolo time slice di 1 s 
             //p.readout_windows[16].Print()
 
-            //Apri un singolo time slice [16] e da questo prendi l'evento hkmpmt_hits[0]
+            //Apri un singolo time slice (cioè la 16) e da questo prendi l'evento hkmpmt_hits[0]
             p.readout_windows[16].hkmpmt_hits[0].Print();
             //Leggi i dati raw di questo evento 
             //p.readout_windows[16].hkmpmt_hits[0].Dump()
