@@ -23,7 +23,7 @@ int main(){
     
     int processedFiles = 0;
 
-    int maxFiles = 50;
+    int maxFiles = 999999;
     
     std::vector<int> charge;
     std::vector<int> PMT_ID;
