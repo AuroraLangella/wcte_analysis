@@ -55,27 +55,33 @@ int main(){
             //int charge[sizeof(p.readout_windows[16])];
             
 
-            //int n = sizeof(p.readout_windows[16]) / sizeof(p.readout_windows[16].hkmpmt_hits[0]);   
-            //cout << n << endl;              
-            //int* charge = new int[n];
+            
             std::vector<int> charge;
-            //cout<<"Size of charge:"<< sizeof(charge)<<endl<<endl;
+            std::vector<int> PMT_ID;
+            
             for (int i=0; i<sizeof(p.readout_windows[16]); i++){
-                cout<<"Valore carica dell'elemento"<<i<<" : "<<p.readout_windows[16].hkmpmt_hits[i].footer.GetCharge()<<endl;
-                //charge[i] = p.readout_windows[16].hkmpmt_hits[i].footer.GetCharge();
-                //cout<< p.readout_windows[16].hkmpmt_hits[i].footer.GetCharge()<<endl;
+                
+                //cout<<"Valore carica dell'elemento "<<i<<" : "<<p.readout_windows[16].hkmpmt_hits[i].footer.GetCharge()<<endl;
+                
                 
                 /*if (p.readout_windows[16].hkmpmt_hits[i].footer.GetCharge() == 4095){
 
                     cout<< p.readout_windows[16].hkmpmt_hits[i].subhits<<endl;
                 }*/
                charge.push_back(p.readout_windows[16].hkmpmt_hits[i].footer.GetCharge());
+               PMT_ID.push_back(p.readout_windows[16].hkmpmt_hits[i].header.GetChannel());
             }
 
-            cout << "Charge vector filled"<<endl;
+            cout << "Charge vector and PMT ID filled"<<endl;
+            /*
             for (int val : charge) {
                 std::cout << val << endl;
             }
+            */
+           for (int val : PMT_ID) {
+                std::cout << val << endl;
+            }
+
 
             //Leggi quale pmt ha visto l'evento
             p.readout_windows[16].hkmpmt_hits[4].header.GetCardID();
