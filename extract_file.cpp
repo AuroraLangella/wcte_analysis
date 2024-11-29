@@ -5,6 +5,8 @@
 #include "Tool.h"
 #include "Store.h"
 #include "WCTERawData.h"
+#include "TFile.h"
+#include "TTree.h"
 
 using namespace std;
 using std::cout;  
@@ -21,8 +23,11 @@ int main(){
     
     int processedFiles = 0;
 
-    int maxFiles = 1;
+    int maxFiles = 50;
     
+    std::vector<int> charge;
+    std::vector<int> PMT_ID;
+    double total_size = 0;
     
     for (const auto& entry : directory_iterator(directoryPath)) {
         
@@ -31,7 +36,7 @@ int main(){
             
             string filePath = entry.path().string();
             
-            cout << "Processing file: " << filePath << std::endl;
+            //cout << "Processing file: " << filePath << std::endl;
             
         
             WCTERawData p;
@@ -56,14 +61,13 @@ int main(){
             
 
             
-            std::vector<int> charge;
-            std::vector<int> PMT_ID;
+            
             //int j = 14;
-            double total_size = 0;
+            
             for (int i=0; i<p.readout_windows.size();i++){
             total_size += p.readout_windows[i].hkmpmt_hits.size();
             }
-            cout<<"Total number of events in the file:"<<total_size<<endl;
+            
             for (int j=0; j<p.readout_windows.size();j++){
             
             for (int i=0; i<p.readout_windows[j].hkmpmt_hits.size(); i++){
@@ -79,9 +83,7 @@ int main(){
                PMT_ID.push_back(p.readout_windows[j].hkmpmt_hits[i].header.GetChannel());
             }
             }
-            cout << "Charge vector and PMT ID filled"<<endl;
-
-            cout<<"Charge size: "<< charge.size()<<" PMT ID size: "<< PMT_ID.size()<<endl;
+            
 
             /*
             for (int val : charge) {
@@ -91,10 +93,10 @@ int main(){
            
 
 
-            //Leggi quale pmt ha visto l'evento
-            p.readout_windows[16].hkmpmt_hits[4].header.GetCardID();
+           
+            //p.readout_windows[16].hkmpmt_hits[4].header.GetCardID();
             // Leggi la carica dell'evento
-            p.readout_windows[16].hkmpmt_hits[0].footer.GetCharge();
+            //p.readout_windows[16].hkmpmt_hits[0].footer.GetCharge();
                       
             processedFiles++;
             
@@ -103,7 +105,38 @@ int main(){
             }
         }
     }
+    cout<<"Total number of events in the file:"<<total_size<<endl;
+    cout << "Charge vector and PMT ID filled"<<endl;
 
+    cout<<"Charge size: "<< charge.size()<<" PMT ID size: "<< PMT_ID.size()<<endl;
+
+    TFile *outputFile = new TFile("run045.root", "RECREATE");
+
+    // Creazione del TTree
+    TTree *tree = new TTree("data", "Tree with charge and PMT_ID");
+
+    // Variabili per i branch
+    int charge_entry;
+    int PMT_ID_entry;
+
+    // Aggiunta dei branch al TTree
+    tree->Branch("charge", &charge_entry);
+    tree->Branch("PMT_ID", &PMT_ID_entry);
+
+    size_t numEntries = std::min(charge.size(), PMT_ID.size());
+    for (size_t i = 0; i < numEntries; ++i) {
+        charge_entry = charge[i];
+        PMT_ID_entry = PMT_ID[i];
+
+        // Riempimento del TTree con i dati correnti
+        tree->Fill();
+    }
+
+    // Scrittura del TTree nel file
+    tree->Write();
+
+    // Chiudere il file .root
+    outputFile->Close();
 
 
 return 0;
