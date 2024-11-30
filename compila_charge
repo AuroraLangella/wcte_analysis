@@ -1,0 +1,2 @@
+g++ -std=c++17 -O3 charge_spectrum.cpp -o charge_spectrum -lstdc++fs
+
