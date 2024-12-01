@@ -24,7 +24,7 @@ all: $(EXECUTABLE)
 %.o: %.cpp
 	$(CC) $(CFLAGS) $(ROOTFLAGS) $(INCDIR) -c $< -o $@
 
-$(oEXECUTABLE): $(OBJ)
+$(EXECUTABLE): $(OBJ)
 	$(CC) $(OBJ) -o $@ $(LIBDIR) $(LIBS)
 
 clean:

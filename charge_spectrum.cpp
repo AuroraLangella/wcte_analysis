@@ -49,11 +49,29 @@ int main() {
         int maxCharge = *max_element(charges.begin(), charges.end());
         int nBins = TMath::Min(100, maxCharge / 10 + 1); 
 
-        
+
         string histName = "hist_PMT_" + to_string(pmt);
         string histTitle = "Charge Spectrum PMT (" + to_string(pmt) + ")";
-        TH1F *hist = new TH1F(histName.c_str(), histTitle.c_str(), nBins, -1000, maxCharge + 1000);
 
+        if (pmt == 2){
+            int maxCharge = *max_element(charges.begin(), charges.end());
+         
+            string histName_zoom = "hist_PMT_zoom" + to_string(pmt);
+            TH1F *hist_zoom = new TH1F(histName_zoom.c_str(), histTitle.c_str(), 1000-260, 260, 1000);
+            for (int c : charges){
+            hist_zoom->Fill(c);
+                        }
+            hist_zoom->GetXaxis()->SetTitle("ADC");
+            hist_zoom->GetYaxis()->SetTitle("Counts");
+            hist_zoom->GetXaxis()->CenterTitle();
+            hist_zoom->GetYaxis()->CenterTitle();        
+            hist_zoom->Draw();
+            canvas->SaveAs((histName_zoom + "_log.png").c_str());
+            canvas->Clear();
+        }
+
+        TH1F *hist = new TH1F(histName.c_str(), histTitle.c_str(), nBins, -1000, maxCharge + 1000);
+        
         
         for (int c : charges) {
             hist->Fill(c);
