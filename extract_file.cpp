@@ -7,6 +7,7 @@
 #include "WCTERawData.h"
 #include "TFile.h"
 #include "TTree.h"
+#include <chrono>
 
 using namespace std;
 using std::cout;  
@@ -16,7 +17,7 @@ using namespace std::filesystem;
 
 int main(){
         
-        
+    auto start = std::chrono::high_resolution_clock::now();
     
     std::string directoryPath = "/storage/wcte-data/run045/";
     
@@ -134,6 +135,13 @@ int main(){
     // Chiudere il file .root
     outputFile->Close();
 
+    auto end = std::chrono::high_resolution_clock::now();
 
-return 0;
+    // Calcola la durata
+    auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(end - start);
+
+    std::cout << "Il processo ha impiegato " << duration.count() << " millisecondi.\n";
+
+
+    return 0;
 }
