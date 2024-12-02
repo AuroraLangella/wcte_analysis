@@ -2,3 +2,6 @@ demo_sw/
 extract_file
 run045.root
 plots/
+runs/
+histograms_run045.root
+*.o
