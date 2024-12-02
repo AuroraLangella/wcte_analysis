@@ -38,7 +38,7 @@ int main() {
     tree->SetBranchAddress("TDCStopTime", &TDCStopTime);
     tree->SetBranchAddress("SubHitNum", &SubHitNum);
 
-    TFile *outputFile = new TFile("/home/alangella/wcte_analysis/runs_time_recon/run045.root", "RECREATE");    
+    TFile *outputFile = new TFile("/home/alangella/wcte_analysis/runs_t_corrected/run045.root", "RECREATE");    
     TTree *newtree = new TTree("data", "mPMT data");
 
     newtree->Branch("Charge", &charge, "Charge/I");

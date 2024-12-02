@@ -17,7 +17,7 @@ using namespace std::filesystem;
 
 int main(){
         
-    auto start = std::chrono::high_resolution_clock::now();
+    auto start = std::chrono::steady_clock::now();
     
     std::string directoryPath = "/storage/wcte-data/run045/";
     
@@ -135,12 +135,12 @@ int main(){
     // Chiudere il file .root
     outputFile->Close();
 
-    auto end = std::chrono::high_resolution_clock::now();
+    auto end = std::chrono::steady_clock::now();
 
     // Calcola la durata
-    auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(end - start);
+    auto duration = std::chrono::duration_cast<std::chrono::seconds>(end - start);
 
-    std::cout << "Il processo ha impiegato " << duration.count() << " millisecondi.\n";
+    std::cout << "Il processo ha impiegato " << duration.count() << " secondi.\n";
 
 
     return 0;
