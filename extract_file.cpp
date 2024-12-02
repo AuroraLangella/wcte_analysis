@@ -26,8 +26,6 @@ int main(){
     int maxFiles = 999999;
     //int maxFiles = 2;
     
-    //std::vector<int> charge;
-    //std::vector<int> PMT_ID;
     double total_size = 0;
 
     TFile *outputFile = new TFile("runs/run045_prova.root", "RECREATE");
@@ -36,12 +34,18 @@ int main(){
     TTree *tree = new TTree("data", "Tree with charge and PMT_ID");
 
     // Variabili per i branch
-    int charge_entry;
-    int PMT_ID_entry;
+    int charge_entry, PMT_ID_entry, FineTime_entry, UnixTime_entry, TDCStartTime_entry, TDCStopTime_entry, TDCCoarseTime_entry, SubHitNum_entry;
 
     // Aggiunta dei branch al TTree
     TBranch *charge = tree->Branch("charge", &charge_entry);
     TBranch *PMT_ID = tree->Branch("PMT_ID", &PMT_ID_entry);
+    TBranch *FineTime = tree->Branch("FineTime", &FineTime_entry);
+    TBranch *UnixTime = tree->Branch("UnixTime", &UnixTime_entry);
+    TBranch *TDCStartTime = tree->Branch("TDCStartTime", &TDCStartTime_entry);
+    TBranch *TDCStopTime = tree->Branch("TDCStopTime", &TDCStopTime_entry);
+    TBranch *TDCCoarseTime = tree->Branch("TDCCoarseTime", &TDCCoarseTime_entry);
+    TBranch *SubHitNum = tree->Branch("SubHitNum", &SubHitNum_entry);
+
     
     for (const auto& entry : directory_iterator(directoryPath)) {
         
@@ -93,30 +97,25 @@ int main(){
 
                     cout<< p.readout_windows[16].hkmpmt_hits[i].subhits<<endl;
                 }*/
-                //charge.push_back(p.readout_windows[j].hkmpmt_hits[i].footer.GetCharge());
-                //PMT_ID.push_back(p.readout_windows[j].hkmpmt_hits[i].header.GetChannel());
+                
                 charge_entry = p.readout_windows[j].hkmpmt_hits[i].footer.GetCharge();
                 PMT_ID_entry = p.readout_windows[j].hkmpmt_hits[i].header.GetChannel();
+                FineTime_entry = p.readout_windows[j].hkmpmt_hits[i].header.GetFineTime(); 
+                TDCStartTime_entry = p.readout_windows[j].hkmpmt_hits[i].header.GetTDCStartTime();
+                TDCStopTime_entry = p.readout_windows[j].hkmpmt_hits[i].header.GetTDCStopTime();
+                TDCCoarseTime_entry = p.readout_windows[j].hkmpmt_hits[i].header.GetTDCCoarseTime();
+                SubHitNum_entry = p.readout_windows[j].hkmpmt_hits[i].header.GetSubHitNum();
+                UnixTime_entry = p.readout_windows[j].hkmpmt_hits[i].footer.GetUnixTime();
+
+
+
 
                 // Riempimento del TTree con i dati correnti
                 tree->Fill();
                 }
             }
-            
-
-            /*
-            for (int val : charge) {
-                std::cout << val << endl;
-            }
-            */
-           
-
-
-           
-            //p.readout_windows[16].hkmpmt_hits[4].header.GetCardID();
-            // Leggi la carica dell'evento
-            //p.readout_windows[16].hkmpmt_hits[0].footer.GetCharge();
-                      
+                             
+                       
             processedFiles++;
             
             if (processedFiles >= maxFiles) {
@@ -128,22 +127,6 @@ int main(){
     cout << "Charge vector and PMT ID filled"<<endl;
 
     cout<<"Charge size: "<< charge->GetEntries()<<" PMT ID size: "<< PMT_ID->GetEntries()<<endl;
-
-    //cout<<"Charge size: "<< charge.size()<<" PMT ID size: "<< PMT_ID.size()<<endl;
-
-    
-
-    
-    /*
-    size_t numEntries = std::min(charge.size(), PMT_ID.size());
-    for (size_t i = 0; i < numEntries; ++i) {
-        charge_entry = charge[i];
-        PMT_ID_entry = PMT_ID[i];
-
-        // Riempimento del TTree con i dati correnti
-        tree->Fill();
-    }
-    */
 
     // Scrittura del TTree nel file
     tree->Write();
