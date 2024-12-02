@@ -19,7 +19,8 @@ int main() {
     TTree *tree = (TTree*)inputFile->Get("data");
 
     int charge, PMT_ID;
-    int ped[] = {260,0,257,259,257,260,256,260,258,260,259,260,260,257,259,259,261,258,258};
+    // piedistalli mpmt04 (manca per PMT 1 perché non calibrato)
+    int ped[] = {260,0,257,259,257,260,256,260,258,260,259,260,260,257,259,259,261,258,258}; 
     int cont = 0;
     
     tree->SetBranchAddress("charge", &charge);

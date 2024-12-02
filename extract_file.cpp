@@ -29,7 +29,7 @@ int main(){
     
     double total_size = 0;
 
-    TFile *outputFile = new TFile("runs/run045_prova.root", "RECREATE");
+    TFile *outputFile = new TFile("runs/run045.root", "RECREATE");
 
     // Creazione del TTree
     TTree *tree = new TTree("data", "Tree with charge and PMT_ID");
