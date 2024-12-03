@@ -24,19 +24,19 @@ int main(){
     
     int processedFiles = 0;
 
-    int maxFiles = 999999;
-    //int maxFiles = 2;
+    //int maxFiles = 999999;
+    int maxFiles = 2;
     
     double total_size = 0;
 
-    TFile *outputFile = new TFile("runs/run045.root", "RECREATE");
+    TFile *outputFile = new TFile("runs/run045_prova.root", "RECREATE");
 
     // Creazione del TTree
     TTree *tree = new TTree("data", "Tree with charge and PMT_ID");
 
     // Variabili per i branch
-    int charge_entry, PMT_ID_entry, FineTime_entry, UnixTime_entry, TDCStartTime_entry, TDCStopTime_entry, TDCCoarseTime_entry, SubHitNum_entry;
-
+    int charge_entry, PMT_ID_entry, FineTime_entry, TDCStartTime_entry, TDCStopTime_entry, TDCCoarseTime_entry, SubHitNum_entry;
+    Long64_t UnixTime_entry;
     // Aggiunta dei branch al TTree
     TBranch *charge = tree->Branch("charge", &charge_entry);
     TBranch *PMT_ID = tree->Branch("PMT_ID", &PMT_ID_entry);

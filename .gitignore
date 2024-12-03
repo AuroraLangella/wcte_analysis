@@ -8,3 +8,4 @@ extract_file.o
 charge_spectrum.o
 runs_t_corrected/
 time_correction.o
+*.png
