@@ -1,1 +1,11 @@
 demo_sw/
+extract_file
+run045.root
+plots/
+runs/
+histograms_run045.root
+extract_file.o
+charge_spectrum.o
+runs_time_recon/
+time_correction.o
+*.png
