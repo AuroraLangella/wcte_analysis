@@ -16,7 +16,7 @@
 using namespace std;
 
 
-std::string getBaseFilename(const std::string& inputFilename) {
+string getBaseFilename(const std::string& inputFilename) {
     // Find the position of the last '/' in the string (directory separator)
     size_t lastSlashPos = inputFilename.find_last_of("/");
 
