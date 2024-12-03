@@ -1,18 +1,47 @@
 #include <iostream>
 #include <map>
 #include <vector>
+#include <cmath>
+#include <string>
 #include <algorithm>
+#include <filesystem>
 #include "TFile.h"
 #include "TTree.h"
 #include "TH1F.h"
 #include "TCanvas.h"
 #include "TMath.h"
+#include <chrono>
+#include "TH1D.h"
+#include <iomanip> 
 
+using namespace std::filesystem; 
 using namespace std;
 
-int main() {
+string getBaseFilename(const std::string& inputFilename) {
+    // Find the position of the last '/' in the string (directory separator)
+    size_t lastSlashPos = inputFilename.find_last_of("/");
+
+    // Extract the file name (everything after the last '/')
+    std::string filenameWithExtension = inputFilename.substr(lastSlashPos + 1);
+
+    // Find the position of the last '.' in the file name (file extension separator)
+    size_t lastDotPos = filenameWithExtension.find_last_of(".");
+
+    // Extract the base filename (everything before the last '.')
+    std::string baseFilename = filenameWithExtension.substr(0, lastDotPos);
+
+    return baseFilename;
+}
+
+int main(int argc, char* argv[]) {
     
-    TFile *inputFile = TFile::Open("/home/alangella/run045.root", "READ");
+    string mPMT_ID = argv[1];
+    string runNumber = argv[2];
+    
+    string inFileName = "/storage/wcte-recon/runs_by_mPMT_time_rec/mPMT"+mPMT_ID+"_run" + std::string(3 - runNumber.length(), '0') + runNumber + ".root"; 
+    
+    string filename = getBaseFilename(inFileName);
+    TFile *inputFile = TFile::Open(inFileName.c_str(), "READ");
     
 
     
@@ -23,7 +52,7 @@ int main() {
     int ped[] = {260,0,257,259,257,260,256,260,258,260,259,260,260,257,259,259,261,258,258}; 
     int cont = 0;
     
-    tree->SetBranchAddress("charge", &charge);
+    tree->SetBranchAddress("Charge", &charge);
     tree->SetBranchAddress("PMT_ID", &PMT_ID);
 
     //le mappe secondo chatgpt erano utili per fare questa cosa, aveva ragione
@@ -35,9 +64,11 @@ int main() {
         tree->GetEntry(i);
         chargeByPMT[PMT_ID].push_back(charge);
     }
+    string dirName = "/home/alangella/wcte_analysis/plots/"+filename;
+    create_directory(dirName);
 
-    
-    TFile *outputFile = new TFile("histograms_run045.root", "RECREATE");    
+    string outFileName = dirName+"/ChargeSpectrum_"+filename+".root";
+    TFile *outputFile = new TFile(outFileName.c_str(), "RECREATE");    
     
     TCanvas *canvas = new TCanvas("canvas", "Charge Spectrum (logscale)", 800, 600);
     canvas->SetLogy();
@@ -59,7 +90,7 @@ int main() {
         string histName = "hist_PMT_" + to_string(pmt);
         string histTitle = "Charge Spectrum PMT (" + to_string(pmt) + ")";
 
-        if (pmt == 2){
+        if (pmt == 4){
             int maxCharge = *max_element(charges.begin(), charges.end());
          
             string histName_zoom = "hist_PMT_zoom" + to_string(pmt);
@@ -72,7 +103,9 @@ int main() {
             hist_zoom->GetXaxis()->CenterTitle();
             hist_zoom->GetYaxis()->CenterTitle();        
             hist_zoom->Draw();
-            canvas->SaveAs(("./plots/"+histName_zoom + "_log.png").c_str());
+            //canvas->SaveAs((dirName+"/"+histName_zoom + "_log.png").c_str());
+            //canvas->SaveAs(("./plots/"+histName_zoom + "_log.png").c_str());
+
             canvas->Clear();
         }
 
@@ -91,7 +124,9 @@ int main() {
 
         
         hist->Draw();
-        canvas->SaveAs(("./plots/"+histName + "_log.png").c_str());
+
+        //canvas->SaveAs((dirName+"/"+histName + ".png").c_str());
+        canvas->SaveAs((dirName+"/"+histName + "_log.png").c_str());
         hist->Write(); 
         canvas->Clear();
         cont = cont+1;
@@ -101,6 +136,6 @@ int main() {
     outputFile->Close();
     inputFile->Close();
 
-    cout << "Istogrammi creati e salvati in 'histograms.root' xoxo" << endl;
+    cout << "Istogrammi creati e salvati in"<< dirName << endl;
     return 0;
 }
