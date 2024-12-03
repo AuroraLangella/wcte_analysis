@@ -15,29 +15,44 @@ using std::endl;
 using std::vector; 
 using namespace std::filesystem; 
 
-int main(){
+/*
+Il programma prende in input il numero del run 
+
+es. ./extract_file 45 or ./extract_file 100
+
+*/
+
+int main(int argc, char* argv[]){
         
     auto start = std::chrono::steady_clock::now();
+
+    std::string runNumber = argv[1];
+
     
-    std::string directoryPath = "/storage/wcte-data/run045/";
+    std::string directoryPath = "/storage/wcte-data/run" + std::string(3 - runNumber.length(), '0') + runNumber + "/";
+    
+    cout<< "Converting data from "+directoryPath<<endl;
     
     
     int processedFiles = 0;
 
-    //int maxFiles = 999999;
-    int maxFiles = 2;
+    int maxFiles = 999999;
+    //int maxFiles = 2;
     
     double total_size = 0;
 
-    TFile *outputFile = new TFile("runs/run045_prova.root", "RECREATE");
+    string outputfilename = "/storage/wcte-recon/runs/run" + std::string(3 - runNumber.length(), '0') + runNumber + ".root";
+
+    TFile *outputFile = new TFile(outputfilename.c_str(), "RECREATE");
 
     // Creazione del TTree
     TTree *tree = new TTree("data", "Tree with charge and PMT_ID");
 
     // Variabili per i branch
-    int charge_entry, PMT_ID_entry, FineTime_entry, TDCStartTime_entry, TDCStopTime_entry, TDCCoarseTime_entry, SubHitNum_entry;
+    int mPMT_ID_entry, charge_entry, PMT_ID_entry, FineTime_entry, TDCStartTime_entry, TDCStopTime_entry, TDCCoarseTime_entry, SubHitNum_entry;
     Long64_t UnixTime_entry;
     // Aggiunta dei branch al TTree
+    TBranch *mPMT_ID = tree->Branch("mPMT_ID", &mPMT_ID_entry);
     TBranch *charge = tree->Branch("charge", &charge_entry);
     TBranch *PMT_ID = tree->Branch("PMT_ID", &PMT_ID_entry);
     TBranch *FineTime = tree->Branch("FineTime", &FineTime_entry);
@@ -89,7 +104,8 @@ int main(){
             
             for (int j=0; j<p.readout_windows.size();j++){
             
-                for (int i=0; i<p.readout_windows[j].hkmpmt_hits.size(); i++){
+                for (int i=0; i<p.readout_windows[j].hkmpmt_hits.size(); i++){    
+   
                 
                 //cout<<"Valore carica dell'elemento "<<i<<" : "<<p.readout_windows[16].hkmpmt_hits[i].footer.GetCharge()<<endl;
                 
@@ -99,6 +115,7 @@ int main(){
                     cout<< p.readout_windows[16].hkmpmt_hits[i].subhits<<endl;
                 }*/
                 
+                mPMT_ID_entry = p.readout_windows[j].hkmpmt_hits[i].header.GetCardID();
                 charge_entry = p.readout_windows[j].hkmpmt_hits[i].footer.GetCharge();
                 PMT_ID_entry = p.readout_windows[j].hkmpmt_hits[i].header.GetChannel();
                 FineTime_entry = p.readout_windows[j].hkmpmt_hits[i].header.GetFineTime(); 
@@ -124,8 +141,9 @@ int main(){
             }
         }
     }
+    cout << "All branches filled"<<endl;
     cout<<"Total number of events in the file:"<<total_size<<endl;
-    cout << "Charge vector and PMT ID filled"<<endl;
+    
 
     cout<<"Charge size: "<< charge->GetEntries()<<" PMT ID size: "<< PMT_ID->GetEntries()<<endl;
 

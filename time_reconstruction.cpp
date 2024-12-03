@@ -82,23 +82,28 @@ void plotAndCheckTrend(TTree* tree, const char* branchName, T& value, string ori
     delete c1;
 }
 
-int main() {
+int main(int argc, char* argv[]) {
     auto start = std::chrono::steady_clock::now();
 
     //Testing Input File    
     //const char* inputfilename = "/home/alangella/wcte_analysis/runs/run045_prova.root";
     //TFile *inputFile = TFile::Open(inputfilename, "READ");
     
+    string mPMT_ID = argv[1];
+    string runNumber = argv[2];
+    
+    string inFileName = "/storage/wcte-recon/runs_by_mPMT/mPMT"+mPMT_ID+"_run" + std::string(3 - runNumber.length(), '0') + runNumber + ".root";    
+    cout<<"Reconstructing and correcting event time for  "<< inFileName<<endl;
+    TFile* inputFile = TFile::Open(inFileName.c_str(), "READ");
 
-    const char* inputfilename = "/storage/wcte-recon/runs/run045.root";
-    TFile *inputFile = TFile::Open(inputfilename, "READ");
-    
-    
     if (!inputFile || inputFile->IsZombie()) {
-        std::cerr << "Errore: impossibile aprire il file di input.\n";
+        std::cerr << "Errore: impossibile aprire il file " << inFileName << std::endl;
         return 1;
     }
-    std::string filename = getBaseFilename(inputfilename);
+  
+    
+       
+    std::string filename = getBaseFilename(inFileName);
     cout<<filename<<endl;
     TTree *tree = (TTree*)inputFile->Get("data");
 
@@ -117,7 +122,7 @@ int main() {
 
     // Testing Output File
     //TFile *outputFile = new TFile("/home/alangella/wcte_analysis/runs_time_recon/run045_t_recon_prova.root", "RECREATE");     
-    string outputfilename = "/storage/wcte-recon/runs_time_recon/"+filename+"_recon.root";
+    string outputfilename = "/storage/wcte-recon/runs_by_mPMT_time_rec/"+filename+".root";
     TFile *outputFile = new TFile(outputfilename.c_str(), "RECREATE");     
     TTree *newtree = new TTree("data", "mPMT data");
 
