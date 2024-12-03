@@ -71,7 +71,7 @@ int main(int argc, char* argv[]) {
     TFile *outputFile = new TFile(outFileName.c_str(), "RECREATE");    
     
     TCanvas *canvas = new TCanvas("canvas", "Charge Spectrum (logscale)", 800, 600);
-    //canvas->SetLogy();
+    canvas->SetLogy();
     // const auto prende direttamente la dimensione della mappa e permette di ciclare sopra sia 
     //la chiave (pmtID che è un int) che la carica (che è un vector<int>)
     for (const auto& entry : chargeByPMT) {
@@ -103,7 +103,7 @@ int main(int argc, char* argv[]) {
             hist_zoom->GetXaxis()->CenterTitle();
             hist_zoom->GetYaxis()->CenterTitle();        
             hist_zoom->Draw();
-            canvas->SaveAs((dirName+"/"+histName_zoom + ".png").c_str());
+            //canvas->SaveAs((dirName+"/"+histName_zoom + "_log.png").c_str());
             //canvas->SaveAs(("./plots/"+histName_zoom + "_log.png").c_str());
 
             canvas->Clear();
@@ -126,7 +126,7 @@ int main(int argc, char* argv[]) {
         hist->Draw();
 
         //canvas->SaveAs((dirName+"/"+histName + ".png").c_str());
-        //canvas->SaveAs((dirName+"/"+histName + "_log.png").c_str());
+        canvas->SaveAs((dirName+"/"+histName + "_log.png").c_str());
         hist->Write(); 
         canvas->Clear();
         cont = cont+1;
