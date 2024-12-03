@@ -90,7 +90,7 @@ int main() {
     //TFile *inputFile = TFile::Open(inputfilename, "READ");
     
 
-    const char* inputfilename = "/home/storage/wcte-data/runs/run045.root";
+    const char* inputfilename = "/storage/wcte-recon/runs/run045.root";
     TFile *inputFile = TFile::Open(inputfilename, "READ");
     
     
@@ -117,7 +117,7 @@ int main() {
 
     // Testing Output File
     //TFile *outputFile = new TFile("/home/alangella/wcte_analysis/runs_time_recon/run045_t_recon_prova.root", "RECREATE");     
-    string outputfilename = "/home/storage/wcte-data/runs_time_recon/"+filename+"_recon.root";
+    string outputfilename = "/storage/wcte-recon/runs_time_recon/"+filename+"_recon.root";
     TFile *outputFile = new TFile(outputfilename.c_str(), "RECREATE");     
     TTree *newtree = new TTree("data", "mPMT data");
 
