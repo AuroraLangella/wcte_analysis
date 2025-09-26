@@ -12,8 +12,75 @@
 #include <chrono>
 #include "TH1D.h"
 #include <iomanip> 
+#include <iostream>
 
 using namespace std;
+
+
+
+
+void SortTree(const char* inputFileName, const char* treeName, const char* branchName, const char* outputFileName) {
+    // Apri il file ROOT e il TTree
+    TFile *inputFile = TFile::Open(inputFileName, "READ");
+    if (!inputFile || inputFile->IsZombie()) {
+        std::cerr << "Errore nell'apertura del file ROOT!" << std::endl;
+        return;
+    }
+    
+    TTree *tree = (TTree*)inputFile->Get(treeName);
+    if (!tree) {
+        std::cerr << "Errore: TTree non trovato!" << std::endl;
+        return;
+    }
+
+    // Variabile per salvare i valori del branch
+    Long64_t value;
+    tree->SetBranchAddress(branchName, &value);
+
+    // Estrarre dati in un vettore
+    std::vector<std::pair<Long64_t, Long64_t>> data;
+    Long64_t nEntries = tree->GetEntries();
+    for (Long64_t i = 0; i < nEntries; ++i) {
+        
+        tree->GetEntry(i);
+        if (i<10){cout<<value<<endl;}
+        data.emplace_back(value, i);
+    }
+
+    // Ordinare i dati in base al valore del branch
+    std::sort(data.begin(), data.end());
+
+
+
+    int n = 10;  // Numero di elementi da stampare
+    n = std::min(n, static_cast<int>(data.size()));  // Evita out-of-bounds
+
+    std::cout << "Primi " << n << " elementi del vettore:\n";
+    for (int i = 0; i < n; i++) {
+        std::cout << "Valore: " << data[i].first << ", Indice: " << data[i].second << std::endl;
+    }
+
+    
+    // Creare un nuovo file ROOT per il TTree ordinato
+    TFile *outputFile = new TFile(outputFileName, "RECREATE");
+    TTree *sortedTree = tree->CloneTree(0);  // Clonare la struttura senza eventi
+
+    // Copiare gli eventi nel nuovo TTree seguendo l'ordine ordinato
+    for (const auto &entry : data) {
+        tree->GetEntry(entry.second);
+        sortedTree->Fill();
+    }
+
+    // Salvare il nuovo TTree e chiudere i file
+    sortedTree->Write();
+    outputFile->Close();
+    inputFile->Close();
+
+    std::cout << "TTree ordinato salvato in: " << outputFileName << std::endl;
+}
+
+
+
 
 
 string getBaseFilename(const std::string& inputFilename) {
@@ -91,10 +158,17 @@ int main(int argc, char* argv[]) {
     
     string mPMT_ID = argv[1];
     string runNumber = argv[2];
+
+    
     
     string inFileName = "/storage/wcte-recon/runs_by_mPMT/mPMT"+mPMT_ID+"_run" + std::string(3 - runNumber.length(), '0') + runNumber + ".root";    
     cout<<"Reconstructing and correcting event time for  "<< inFileName<<endl;
-    TFile* inputFile = TFile::Open(inFileName.c_str(), "READ");
+
+    SortTree(inFileName.c_str(), "data", "UnixTime", "/storage/wcte-recon/runs_by_mPMT/sorted_prova.root");
+
+    //string inFileName2 = "/storage/wcte-recon/runs_by_mPMT/mPMT"+mPMT_ID+"_run" + std::string(3 - runNumber.length(), '0') + runNumber + "_sorted.root";
+    string inFileName2 = "/storage/wcte-recon/runs_by_mPMT/sorted_prova.root";
+    TFile* inputFile = TFile::Open(inFileName2.c_str(), "READ");
 
     if (!inputFile || inputFile->IsZombie()) {
         std::cerr << "Errore: impossibile aprire il file " << inFileName << std::endl;
@@ -120,6 +194,11 @@ int main(int argc, char* argv[]) {
     tree->SetBranchAddress("TDCStopTime", &TDCStopTime);
     tree->SetBranchAddress("SubHitNum", &SubHitNum);
 
+
+    
+
+
+
     // Testing Output File
     //TFile *outputFile = new TFile("/home/alangella/wcte_analysis/runs_time_recon/run045_t_recon_prova.root", "RECREATE");     
     string outputfilename = "/storage/wcte-recon/runs_by_mPMT_time_rec/"+filename+".root";
@@ -138,7 +217,7 @@ int main(int argc, char* argv[]) {
     newtree->Branch("ToT", &tot, "ToT/D");
 
 
-    const double UnixTimeOverflow = 2e14-1; // Overflow ogni 2x10^14 secondi
+    const double UnixTimeOverflow = pow(2,14)-1; // Overflow ogni 2^14 secondi
     
 
     // Variabili per monitorare overflow

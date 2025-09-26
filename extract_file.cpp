@@ -9,11 +9,11 @@
 #include "TTree.h"
 #include <chrono>
 
+using namespace std::filesystem; 
 using namespace std;
 using std::cout;  
 using std::endl;  
 using std::vector; 
-using namespace std::filesystem; 
 
 /*
 Il programma prende in input il numero del run 
@@ -51,6 +51,9 @@ int main(int argc, char* argv[]){
     // Variabili per i branch
     int mPMT_ID_entry, charge_entry, PMT_ID_entry, FineTime_entry, TDCStartTime_entry, TDCStopTime_entry, TDCCoarseTime_entry, SubHitNum_entry;
     Long64_t UnixTime_entry;
+
+    int SubHitFineTimeDelta_array[15] = {0};
+    UChar_t SubHitTDCStartTime_array[15],SubHitTDCCoarseTime_array[15], SubHitTDCStopTime_array[15];
     // Aggiunta dei branch al TTree
     TBranch *mPMT_ID = tree->Branch("mPMT_ID", &mPMT_ID_entry);
     TBranch *charge = tree->Branch("charge", &charge_entry);
@@ -61,7 +64,14 @@ int main(int argc, char* argv[]){
     TBranch *TDCStopTime = tree->Branch("TDCStopTime", &TDCStopTime_entry);
     TBranch *TDCCoarseTime = tree->Branch("TDCCoarseTime", &TDCCoarseTime_entry);
     TBranch *SubHitNum = tree->Branch("SubHitNum", &SubHitNum_entry);
-
+    TBranch *SubHitFineTimeDelta = tree->Branch("SubHitTimeFineDelta", &SubHitFineTimeDelta_array, "SubHitTimeFineDelta[15]/I");
+    //TBranch *SubHitTDCStartTime = tree->Branch("SubHitTDCStartTime", &SubHitTDCStartTime_array);
+    //TBranch *SubHitTDCCoarseTime = tree->Branch("SubHitTDCCoarseTime", &SubHitTDCCoarseTime_array);
+    //TBranch *SubHitTDCStopTime = tree->Branch("SubHitTDCStopTime", &SubHitTDCStopTime_array);
+    
+    TBranch *SubHitTDCStartTime = tree->Branch("SubHitTDCStartTime", SubHitTDCStartTime_array, "SubHitTDCStartTime[15]/b");
+    TBranch *SubHitTDCCoarseTime =tree->Branch("SubHitTDCCoarseTime", SubHitTDCCoarseTime_array, "SubHitTDCCoarseTime[15]/b");
+    TBranch *SubHitTDCStopTime = tree->Branch("SubHitTDCStopTime", SubHitTDCStopTime_array, "SubHitTDCStopTime[15]/b");
     
     for (const auto& entry : directory_iterator(directoryPath)) {
         
@@ -124,7 +134,17 @@ int main(int argc, char* argv[]){
                 TDCCoarseTime_entry = p.readout_windows[j].hkmpmt_hits[i].header.GetTDCCoarseTime();
                 SubHitNum_entry = p.readout_windows[j].hkmpmt_hits[i].header.GetSubHitNum();
                 UnixTime_entry = p.readout_windows[j].hkmpmt_hits[i].footer.GetUnixTime();
-
+                if (SubHitNum_entry!= 0){
+                    for (int k=0; k < p.readout_windows[j].hkmpmt_hits[i].sub_hits.size(); k++){
+                        //cout<<SubHitNum_entry<< " "<<p.readout_windows[j].hkmpmt_hits[i].sub_hits.size()<<" "<< p.readout_windows[j].hkmpmt_hits[i].sub_hits[k].GetFineTimeDelta()<<endl;
+            
+                        SubHitFineTimeDelta_array[k] = p.readout_windows[j].hkmpmt_hits[i].sub_hits[k].GetFineTimeDelta();
+                        SubHitTDCStartTime_array[k] = p.readout_windows[j].hkmpmt_hits[i].sub_hits[k].GetTDCStartTime();
+                        SubHitTDCCoarseTime_array[k] = p.readout_windows[j].hkmpmt_hits[i].sub_hits[k].GetTDCCoarseTime();
+                        SubHitTDCStopTime_array[k] = p.readout_windows[j].hkmpmt_hits[i].sub_hits[k].GetTDCStopTime();
+                        //cout<<SubHitFineTimeDelta_array[k]<<endl<<endl;
+                    }
+                }
 
 
 
